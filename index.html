@@ -3,31 +3,50 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>দারুল হিকমা মাদ্রাসা</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f2f6f4;color:#18352c}
-header{background:#075c43;color:white;padding:22px 15px;text-align:center}
-header h2{margin:0 0 7px;font-size:21px}
+body{margin:0;background:#f3f7f5;color:#18372d;font-family:Arial,sans-serif}
+header{background:#075c43;color:white;padding:20px 12px;text-align:center}
+header h2{font-size:20px;margin:0 0 7px}
 header p{margin:0;font-size:13px}
-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px}
-nav button{border:0;border-radius:9px;background:#dcece5;color:#075c43;padding:12px 5px;font-weight:bold}
-nav button.active{background:#075c43;color:white}
-main{padding:12px}
-.panel{background:white;padding:16px;border-radius:12px;margin-bottom:13px;box-shadow:0 2px 8px #0000000b}
-h3{margin:0 0 14px;color:#075c43}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:#e6f3ed;padding:17px;border-radius:10px}
-.stat b{display:block;font-size:25px;color:#075c43}
-.stat span{font-size:13px}
-input,select,textarea{width:100%;padding:12px;margin:6px 0 12px;border:1px solid #cbd8d1;border-radius:7px;font-size:15px}
-label{font-size:14px;font-weight:bold}
-.action{background:#08734f;color:white;border:0;padding:12px 17px;border-radius:7px;font-weight:bold}
-.delete{background:#b83232;color:white;border:0;padding:7px 10px;border-radius:6px}
-.item{border-bottom:1px solid #e4e9e5;padding:12px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}
-.small{font-size:12px;color:#64766d}
-footer{text-align:center;padding:20px;color:#718078;font-size:12px}
+.wrap{max-width:900px;margin:auto;padding:12px}
+.panel,.welcome{background:white;border-radius:12px;padding:15px;margin:10px 0;box-shadow:0 2px 9px #1231}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.tile{border:0;border-radius:10px;background:#e3f1ea;color:#075c43;padding:13px 9px;text-align:left;font-weight:bold;min-height:65px}
+.tile small{display:block;font-weight:normal;margin-top:5px}
+button{cursor:pointer}
+.primary{background:#08734f;color:white;border:0;padding:11px 15px;border-radius:8px;font-weight:bold}
+.secondary{background:#e5eee9;color:#075c43;border:0;padding:9px 12px;border-radius:8px}
+.danger{background:#b83232;color:white;border:0;padding:8px 10px;border-radius:7px}
+input,select,textarea{width:100%;padding:11px;margin:5px 0 12px;border:1px solid #cbd8d1;border-radius:7px;font-size:15px}
+label{font-size:13px;font-weight:bold}
+h3{color:#075c43;margin:0 0 13px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.record{border-top:1px solid #e5ece8;padding:11px 0;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.record div{overflow-wrap:anywhere}
+.muted{color:#687d74;font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.stat{background:#e5f2eb;border-radius:10px;padding:14px}
+.stat b{display:block;font-size:23px;color:#075c43}
+footer{text-align:center;padding:18px;color:#718078;font-size:12px}
+.print-area{display:none}
+@media(min-width:650px){
+.grid{grid-template-columns:repeat(3,1fr)}
+.cards{grid-template-columns:repeat(4,1fr)}
+}
+@media print{
+@page{size:A4;margin:8mm}
+body{background:white}
+.wrap,header,footer{display:none!important}
+.print-area{display:block!important}
+.print-two{display:grid;grid-template-rows:1fr 1fr;gap:5mm;height:280mm}
+.print-card{border:1px solid #333;padding:6mm;overflow:hidden;page-break-inside:avoid;font-size:10px}
+.print-card h2,.print-card h3{text-align:center;color:black}
+.print-card table{width:100%;border-collapse:collapse}
+.print-card td,.print-card th{border:1px solid #555;padding:3px;text-align:left}
+}
 </style>
 </head>
 <body>
@@ -37,95 +56,376 @@ footer{text-align:center;padding:20px;color:#718078;font-size:12px}
 <p>মাদ্রাসা ম্যানেজমেন্ট সিস্টেম</p>
 </header>
 
-<nav id="menu"></nav>
-<main id="app"></main>
-<footer>আল্লাহ আমাদের দ্বীনি খেদমত কবুল করুন।</footer>
+<div class="wrap"><div id="app"></div></div>
+<footer>আল্লাহ আমাদের দ্বীনি খেদমত কবুল করুন</footer>
 
 <script>
-const modules={
-students:{title:"শিক্ষার্থী ব্যবস্থাপনা",fields:[
-["name","শিক্ষার্থীর নাম"],["father","পিতার নাম"],["class","জামাত/শ্রেণি"],["phone","মোবাইল নম্বর"],["address","ঠিকানা"]]},
-teachers:{title:"শিক্ষক ও কর্মচারী",fields:[
-["name","নাম"],["designation","পদবি"],["phone","মোবাইল নম্বর"],["salary","মাসিক বেতন"]]},
-attendance:{title:"দৈনিক উপস্থিতি",fields:[
-["name","শিক্ষার্থীর নাম"],["date","তারিখ","date"],["status","উপস্থিতি","select"]]},
-fees:{title:"বেতন ও ফি",fields:[
-["name","শিক্ষার্থীর নাম"],["month","মাস"],["amount","টাকার পরিমাণ"],["date","জমার তারিখ","date"]]},
-results:{title:"পরীক্ষার ফলাফল",fields:[
-["name","শিক্ষার্থীর নাম"],["exam","পরীক্ষার নাম"],["subject","বিষয়"],["marks","প্রাপ্ত নম্বর"]]},
-accounts:{title:"আয়-ব্যয়ের হিসাব",fields:[
-["type","হিসাবের ধরন","select"],["details","বিবরণ"],["amount","টাকার পরিমাণ"],["date","তারিখ","date"]]},
-notices:{title:"নোটিশ বোর্ড",fields:[
-["title","নোটিশের শিরোনাম"],["details","নোটিশের বিবরণ"],["date","তারিখ","date"]]}
+const items=[
+["dashboard","ড্যাশবোর্ড"],
+["admission","শিক্ষার্থী ভর্তি"],
+["students","শিক্ষার্থীর তালিকা"],
+["gender","ছাত্র ও ছাত্রী বিভাগ"],
+["profile","শিক্ষার্থীর প্রোফাইল"],
+["teachers","শিক্ষক ও কর্মচারী"],
+["teacher_att","শিক্ষক হাজিরা"],
+["student_att","শিক্ষার্থী হাজিরা"],
+["classes","জামাত ও শ্রেণি ব্যবস্থাপনা"],
+["branches","বিভাগ ও শাখা ব্যবস্থাপনা"],
+["fees","মাসিক বেতন আদায়"],
+["dues","বেতন বকেয়া তালিকা"],
+["otherfees","অন্যান্য ফি আদায়"],
+["accounts","আয়-ব্যয়ের হিসাব"],
+["exams","পরীক্ষা ব্যবস্থাপনা"],
+["results","পরীক্ষার ফলাফল"],
+["marksheet","মার্কশিট তৈরি"],
+["certificate","প্রশংসাপত্র তৈরি"],
+["leave","ছুটির আবেদন"],
+["notices","নোটিশ বোর্ড"],
+["guardians","অভিভাবকের তথ্য"],
+["sms","এসএমএস নোটিফিকেশন"],
+["student_id","শিক্ষার্থীর আইডি কার্ড"],
+["teacher_id","শিক্ষক আইডি কার্ড"],
+["library","লাইব্রেরি ব্যবস্থাপনা"],
+["hostel","হোস্টেল ব্যবস্থাপনা"],
+["books","কিতাব ও বই ব্যবস্থাপনা"],
+["reports","রিপোর্ট ও PDF ডাউনলোড"],
+["backup","ডেটা ব্যাকআপ ও পুনরুদ্ধার"],
+["settings","অ্যাডমিন সেটিংস ও নিরাপত্তা"]
+];
+
+const fields={
+admission:[
+["name","শিক্ষার্থীর পূর্ণ নাম"],
+["admissionNo","ভর্তি নম্বর"],
+["gender","ছাত্র/ছাত্রী","select","ছাত্র,ছাত্রী"],
+["dob","জন্মতারিখ","date"],
+["birthReg","জন্মনিবন্ধন নম্বর"],
+["blood","রক্তের গ্রুপ"],
+["nationality","জাতীয়তা"],
+["religion","ধর্ম"],
+["father","পিতার পূর্ণ নাম"],
+["fatherJob","পিতার পেশা"],
+["fatherPhone","পিতার মোবাইল নম্বর"],
+["mother","মাতার পূর্ণ নাম"],
+["motherJob","মাতার পেশা"],
+["motherPhone","মাতার মোবাইল নম্বর"],
+["guardian","অভিভাবকের নাম"],
+["relation","অভিভাবকের সাথে সম্পর্ক"],
+["guardianPhone","অভিভাবকের মোবাইল নম্বর"],
+["emergencyPhone","জরুরি যোগাযোগ নম্বর"],
+["presentAddress","বর্তমান ঠিকানা"],
+["permanentAddress","স্থায়ী ঠিকানা"],
+["class","জামাত/শ্রেণি"],
+["branch","বিভাগ/শাখা"],
+["section","শাখা/গ্রুপ"],
+["previousSchool","পূর্ববর্তী প্রতিষ্ঠানের নাম"],
+["previousClass","পূর্ববর্তী শ্রেণি/জামাত"],
+["admitDate","ভর্তির তারিখ","date"],
+["monthlyFee","মাসিক বেতন"],
+["discount","বেতন/ফি ছাড়"],
+["medicalNote","স্বাস্থ্যসংক্রান্ত জরুরি তথ্য"],
+["remarks","অতিরিক্ত মন্তব্য","textarea"]
+],
+students:[["name","শিক্ষার্থীর নাম"],["admissionNo","ভর্তি নম্বর"],["class","জামাত"],["phone","মোবাইল"]],
+gender:[["name","শিক্ষার্থীর নাম"],["gender","ছাত্র/ছাত্রী","select","ছাত্র,ছাত্রী"],["class","জামাত"]],
+profile:[["name","শিক্ষার্থীর নাম"],["admissionNo","ভর্তি নম্বর"],["details","বিস্তারিত তথ্য","textarea"]],
+teachers:[["name","নাম"],["designation","পদবি"],["phone","মোবাইল"],["salary","বেতন"]],
+teacher_att:[["name","শিক্ষকের নাম"],["date","তারিখ","date"],["status","অবস্থা","select","উপস্থিত,অনুপস্থিত,ছুটি"]],
+student_att:[["name","শিক্ষার্থীর নাম"],["class","জামাত"],["date","তারিখ","date"],["status","অবস্থা","select","উপস্থিত,অনুপস্থিত,ছুটি"]],
+classes:[["name","জামাত/শ্রেণির নাম"],["teacher","দায়িত্বপ্রাপ্ত শিক্ষক"],["details","বিবরণ"]],
+branches:[["name","বিভাগ/শাখার নাম"],["details","বিবরণ"]],
+fees:[["name","শিক্ষার্থীর নাম"],["month","মাস"],["amount","টাকার পরিমাণ"],["date","জমার তারিখ","date"]],
+dues:[["name","শিক্ষার্থীর নাম"],["month","বকেয়ার মাস"],["amount","বকেয়া টাকা"],["phone","মোবাইল"]],
+otherfees:[["name","শিক্ষার্থীর নাম"],["fee","ফি-এর ধরন"],["amount","টাকার পরিমাণ"],["date","তারিখ","date"]],
+accounts:[["type","আয়/ব্যয়","select","আয়,ব্যয়"],["details","বিবরণ"],["amount","টাকার পরিমাণ"],["date","তারিখ","date"]],
+exams:[["name","পরীক্ষার নাম"],["class","জামাত"],["date","পরীক্ষার তারিখ","date"]],
+marksheet:[["name","শিক্ষার্থীর নাম"],["exam","পরীক্ষার নাম"],["total","মোট নম্বর"],["obtained","প্রাপ্ত নম্বর"],["grade","গ্রেড"]],
+certificate:[["name","শিক্ষার্থীর নাম"],["father","পিতার নাম"],["class","জামাত"],["details","সনদের বিবরণ","textarea"]],
+leave:[["name","আবেদনকারীর নাম"],["role","শিক্ষার্থী/শিক্ষক"],["from","শুরুর তারিখ","date"],["to","শেষের তারিখ","date"],["reason","ছুটির কারণ","textarea"],["status","আবেদনের অবস্থা","select","অনুমোদিত,বিবেচনাধীন,নাকচ"]],
+notices:[["title","নোটিশের শিরোনাম"],["date","তারিখ","date"],["details","বিবরণ","textarea"]],
+guardians:[["student","শিক্ষার্থীর নাম"],["name","অভিভাবকের নাম"],["relation","সম্পর্ক"],["phone","মোবাইল"],["address","ঠিকানা"]],
+sms:[["phone","প্রাপকের মোবাইল"],["message","বার্তার খসড়া","textarea"]],
+student_id:[["name","শিক্ষার্থীর নাম"],["admissionNo","ভর্তি নম্বর"],["class","জামাত"],["valid","মেয়াদ"]],
+teacher_id:[["name","শিক্ষকের নাম"],["designation","পদবি"],["phone","মোবাইল"]],
+library:[["book","বইয়ের নাম"],["author","লেখক"],["quantity","কপি সংখ্যা"],["details","বিবরণ"]],
+hostel:[["name","আবাসিক শিক্ষার্থীর নাম"],["room","কক্ষ নম্বর"],["class","জামাত"],["guardian","অভিভাবকের মোবাইল"]],
+books:[["name","কিতাব/বইয়ের নাম"],["class","জামাত"],["quantity","পরিমাণ"],["details","বিবরণ"]]
 };
 
-let current="home";
-let db=JSON.parse(localStorage.getItem("madrasaDB")||"{}");
-function save(){localStorage.setItem("madrasaDB",JSON.stringify(db))}
+let db={};
+try{db=JSON.parse(localStorage.getItem("dhm30")||"{}")}catch(e){db={}}
+
+let config={};
+try{config=JSON.parse(localStorage.getItem("dhmConfig")||"{}")}catch(e){config={}}
+if(!Array.isArray(config.subjects))
+config.subjects=Array.from({length:14},(_,i)=>"বিষয় "+(i+1));
+if(!Array.isArray(config.months))
+config.months=Array(12).fill("");
+
+function save(){localStorage.setItem("dhm30",JSON.stringify(db))}
+function saveConfig(){localStorage.setItem("dhmConfig",JSON.stringify(config))}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function count(k){return (db[k]||[]).length}
 
-const labels={home:"হোম",students:"শিক্ষার্থী",teachers:"শিক্ষক",attendance:"উপস্থিতি",fees:"বেতন",results:"ফলাফল",accounts:"হিসাব",notices:"নোটিশ",reports:"রিপোর্ট"};
-
-function show(key){
-current=key;
-document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.key===key));
-let a=document.getElementById("app");
-
-if(key==="home"){
-a.innerHTML=`<div class="panel"><h3>আসসালামু আলাইকুম</h3>মাদ্রাসা ম্যানেজমেন্ট ড্যাশবোর্ডে স্বাগতম।</div>
+function home(){
+return `<div class="welcome">
+<h3>আসসালামু আলাইকুম</h3>
+মাদ্রাসা ম্যানেজমেন্ট ড্যাশবোর্ডে স্বাগতম।
+</div>
 <div class="cards">
-${["students","teachers","attendance","fees","results","notices"].map(k=>`<div class="stat"><b>${count(k)}</b><span>${labels[k]} রেকর্ড</span></div>`).join("")}
+${items.slice(1).map(x=>`<div class="stat"><b>${count(x[0])}</b>${x[1]}</div>`).join("")}
+</div>
+<div class="panel">
+<h3>৩০টি ব্যবস্থাপনা অপশন</h3>
+<div class="grid">
+${items.map(x=>`<button class="tile" onclick="openPage('${x[0]}')">${x[1]}</button>`).join("")}
+</div>
 </div>`;
-return;
 }
-if(key==="reports"){
-a.innerHTML=`<div class="panel"><h3>রিপোর্ট</h3>
-${Object.keys(modules).map(k=>`<div class="item"><span>${modules[k].title}</span><b>${count(k)}</b></div>`).join("")}
-</div>`;
-return;
+
+function render(){
+document.getElementById("app").innerHTML=home();
 }
-let m=modules[key];
-let fields=m.fields.map(f=>`<label>${f[1]}</label>${
-f[2]==="select"?
-`<select name="${f[0]}" required><option value="">নির্বাচন করুন</option>${(f[0]==="status"?["উপস্থিত","অনুপস্থিত","ছুটি"]:["আয়","ব্যয়"]).map(x=>`<option>${x}</option>`).join("")}</select>`:
-`<input name="${f[0]}" type="${f[2]||"text"}" placeholder="${f[1]}" required>`
-}`).join("");
 
-a.innerHTML=`<div class="panel"><h3>${m.title}</h3>
-<form id="entryForm">${fields}<button class="action" type="submit">তথ্য সংরক্ষণ করুন</button></form>
-</div><div class="panel"><h3>সংরক্ষিত তথ্য (${count(key)})</h3><div id="records"></div></div>`;
+function openPage(k){
+if(k==="dashboard"){render();return}
+if(k==="reports"){report();return}
+if(k==="backup"){backup();return}
+if(k==="settings"){settings();return}
+if(k==="results"){openResultPage();return}
 
-document.getElementById("entryForm").onsubmit=e=>{
+let item=items.find(x=>x[0]===k);
+let fs=fields[k]||[["name","নাম"],["details","বিবরণ","textarea"]];
+
+let form=fs.map(f=>`
+<label>${f[1]}</label>
+${f[2]==="textarea"
+?`<textarea name="${f[0]}"></textarea>`
+:f[2]==="select"
+?`<select name="${f[0]}"><option value="">নির্বাচন করুন</option>${f[3].split(",").map(v=>`<option>${v}</option>`).join("")}</select>`
+:`<input name="${f[0]}" type="${f[2]||"text"}">`}
+`).join("");
+
+document.getElementById("app").innerHTML=`
+<div class="panel">
+<div class="topline"><h3>${item[1]}</h3>
+<button class="secondary" onclick="render()">← হোম</button></div>
+<form id="entry">${form}<button class="primary">তথ্য সংরক্ষণ করুন</button></form>
+</div>
+<div class="panel"><h3>সংরক্ষিত তথ্য (${count(k)})</h3><div id="records"></div></div>`;
+
+document.getElementById("entry").onsubmit=e=>{
 e.preventDefault();
-let data=Object.fromEntries(new FormData(e.target).entries());
-if(!db[key])db[key]=[];
-db[key].push({...data,id:Date.now()});
-save();show(key);
+let d=Object.fromEntries(new FormData(e.target));
+(db[k]??=[]).push({...d,id:Date.now()});
+save();openPage(k);
 };
-renderRecords(key);
+
+let rs=db[k]||[];
+document.getElementById("records").innerHTML=rs.length?
+rs.slice().reverse().map(r=>`
+<div class="record">
+<div>${fs.map(f=>`<div><b>${f[1]}:</b> ${esc(r[f[0]])}</div>`).join("")}</div>
+<div>
+${k==="admission"?`<button class="secondary" onclick="printAdmission(${r.id})">A4 প্রিন্ট</button>`:""}
+<button class="danger" onclick="del('${k}',${r.id})">মুছুন</button>
+</div></div>`).join("")
+:"<p class='muted'>এখনো কোনো তথ্য যোগ করা হয়নি।</p>";
 }
 
-function renderRecords(key){
-let box=document.getElementById("records");
-if(!box)return;
-let rows=db[key]||[];
-box.innerHTML=rows.length?rows.slice().reverse().map(r=>
-`<div class="item"><div>${modules[key].fields.map(f=>`<div><b>${f[1]}:</b> ${escapeHTML(r[f[0]]||"")}</div>`).join("")}</div>
-<button class="delete" onclick="removeRecord('${key}',${r.id})">মুছুন</button></div>`
-).join(""):"<p class='small'>এখনো কোনো তথ্য যোগ করা হয়নি।</p>";
+function openResultPage(){
+let names=config.subjects;
+let subjectInputs=names.map((n,i)=>`
+<div class="record">
+<label style="flex:1">${esc(n||("বিষয় "+(i+1)))}
+<input name="mark${i}" type="number" placeholder="প্রাপ্ত নম্বর"></label>
+<label style="flex:1">পূর্ণ নম্বর
+<input name="full${i}" type="number" placeholder="পূর্ণ নম্বর"></label>
+</div>`).join("");
+
+document.getElementById("app").innerHTML=`
+<div class="panel">
+<div class="topline"><h3>পরীক্ষার ফলাফল</h3>
+<button class="secondary" onclick="render()">← হোম</button></div>
+<p class="muted">বিষয় ও সংখ্যা সেটিংস থেকে পরিবর্তন করুন।</p>
+<form id="resultForm">
+<label>শিক্ষার্থীর নাম</label><input name="name" required>
+<label>ভর্তি নম্বর</label><input name="admissionNo">
+<label>জামাত/শ্রেণি</label><input name="class">
+<label>পরীক্ষার নাম</label><input name="exam">
+<label>পরীক্ষার তারিখ</label><input name="date" type="date">
+${subjectInputs}
+<label>মোট নম্বর</label><input name="total" type="number">
+<label>প্রাপ্ত মোট নম্বর</label><input name="obtained" type="number">
+<label>গ্রেড</label><input name="grade">
+<label>মন্তব্য</label><textarea name="remarks"></textarea>
+<button class="primary">ফলাফল সংরক্ষণ করুন</button>
+</form>
+</div>
+<div class="panel"><h3>সংরক্ষিত ফলাফল</h3><div id="resultRecords"></div></div>`;
+
+document.getElementById("resultForm").onsubmit=e=>{
+e.preventDefault();
+let d=Object.fromEntries(new FormData(e.target));
+d.subjectNames=[...config.subjects];
+(db.results??=[]).push({...d,id:Date.now()});
+save();openResultPage();
+};
+
+let rs=db.results||[];
+document.getElementById("resultRecords").innerHTML=rs.slice().reverse().map(r=>`
+<div class="record">
+<div><b>${esc(r.name)}</b><br>${esc(r.exam)}<br>প্রাপ্ত নম্বর: ${esc(r.obtained)} / ${esc(r.total)}</div>
+<div><button class="secondary" onclick="printResult(${r.id})">A4 ফলাফল শিট</button>
+<button class="danger" onclick="del('results',${r.id})">মুছুন</button></div>
+</div>`).join("")||"এখনো ফলাফল নেই।";
 }
-function removeRecord(key,id){
-if(confirm("তথ্যটি মুছে ফেলতে চান?")){
-db[key]=(db[key]||[]).filter(x=>x.id!==id);
-save();show(key);
+
+function printAdmission(id){
+let r=(db.admission||[]).find(x=>x.id===id);
+if(!r)return;
+let copy=()=>`<section class="print-card">
+<h2>দারুল হিকমা খানম নূরানী ও হাফেজিয়া মাদ্রাসা</h2>
+<h3>শিক্ষার্থী ভর্তি ফরম</h3>
+<table>${fields.admission.map(f=>`<tr><th>${esc(f[1])}</th><td>${esc(r[f[0]]||"")}</td></tr>`).join("")}</table>
+<p>অভিভাবকের স্বাক্ষর: __________ কর্তৃপক্ষের স্বাক্ষর: __________</p>
+</section>`;
+printHTML(`<div class="print-two">${copy()}${copy()}</div>`);
+}
+
+function printResult(id){
+let r=(db.results||[]).find(x=>x.id===id);
+if(!r)return;
+let names=r.subjectNames||config.subjects;
+let copy=()=>`<section class="print-card">
+<h2>দারুল হিকমা খানম নূরানী ও হাফেজিয়া মাদ্রাসা</h2>
+<h3>পরীক্ষার ফলাফল / মার্কশিট</h3>
+<p>নাম: ${esc(r.name)} | ভর্তি নম্বর: ${esc(r.admissionNo)} | জামাত: ${esc(r.class)}</p>
+<p>পরীক্ষা: ${esc(r.exam)} | তারিখ: ${esc(r.date)}</p>
+<table><tr><th>বিষয়</th><th>প্রাপ্ত নম্বর</th><th>পূর্ণ নম্বর</th></tr>
+${names.map((n,i)=>`<tr><td>${esc(n)}</td><td>${esc(r["mark"+i]||"")}</td><td>${esc(r["full"+i]||"")}</td></tr>`).join("")}
+</table>
+<p>মোট: ${esc(r.obtained)} / ${esc(r.total)} | গ্রেড: ${esc(r.grade)}</p>
+<p>মন্তব্য: ${esc(r.remarks)}</p>
+<p>শ্রেণি শিক্ষকের স্বাক্ষর: __________ অধ্যক্ষের স্বাক্ষর: __________</p>
+</section>`;
+printHTML(`<div class="print-two">${copy()}${copy()}</div>`);
+}
+
+function printHTML(content){
+let old=document.getElementById("printRoot");
+if(old)old.remove();
+let el=document.createElement("div");
+el.id="printRoot";el.className="print-area";
+el.innerHTML=content;
+document.body.appendChild(el);
+window.print();
+el.remove();
+}
+
+function del(k,id){
+if(confirm("এই তথ্য মুছবেন?")){
+db[k]=(db[k]||[]).filter(r=>r.id!==id);
+save();
+if(k==="results")openResultPage();else openPage(k);
 }
 }
-function escapeHTML(s){
-return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function report(){
+document.getElementById("app").innerHTML=`
+<div class="panel">
+<div class="topline"><h3>রিপোর্ট</h3><button class="secondary" onclick="render()">← হোম</button></div>
+${items.slice(1).map(x=>`<div class="record">${x[1]} <b>${count(x[0])}</b></div>`).join("")}
+<button class="primary" onclick="window.print()">প্রিন্ট / PDF</button>
+</div>`;
 }
-document.getElementById("menu").innerHTML=Object.entries(labels).map(([k,v])=>
-`<button data-key="${k}" onclick="show('${k}')">${v}</button>`).join("");
-show("home");
+
+function backup(){
+document.getElementById("app").innerHTML=`
+<div class="panel">
+<div class="topline"><h3>ডেটা ব্যাকআপ</h3><button class="secondary" onclick="render()">← হোম</button></div>
+<p>তথ্য JSON ফাইল হিসেবে ডাউনলোড করুন।</p>
+<button class="primary" onclick="downloadBackup()">ব্যাকআপ ডাউনলোড</button>
+<p>ব্যাকআপ ফিরিয়ে আনুন:</p>
+<input type="file" accept=".json,application/json" onchange="restoreBackup(event)">
+</div>`;
+}
+
+function downloadBackup(){
+let a=document.createElement("a");
+let u=URL.createObjectURL(new Blob([JSON.stringify({db,config},null,2)],{type:"application/json"}));
+a.href=u;a.download="darul-hikma-backup.json";a.click();
+URL.revokeObjectURL(u);
+}
+
+function restoreBackup(e){
+let f=e.target.files[0];if(!f)return;
+let r=new FileReader();
+r.onload=()=>{
+try{
+let data=JSON.parse(r.result);
+if(data.db){db=data.db;config=data.config||config}
+else{db=data}
+save();saveConfig();alert("ব্যাকআপ পুনরুদ্ধার হয়েছে");render();
+}catch(x){alert("ফাইলটি সঠিক নয়")}
+};
+r.readAsText(f);
+}
+
+function settings(){
+document.getElementById("app").innerHTML=`
+<div class="panel">
+<div class="topline"><h3>ফরম সম্পাদনা ও সেটিংস</h3>
+<button class="secondary" onclick="render()">← হোম</button></div>
+<h3>ফলাফলের বিষয়ের নাম</h3>
+<p class="muted">১৪টি বিষয়ের নাম বদলান, বাদ দিন বা নতুন বিষয় যোগ করুন।</p>
+<div id="subjectList"></div>
+<button class="secondary" onclick="addSubject()">+ নতুন বিষয় যোগ করুন</button>
+<hr>
+<h3>১২ মাসের নাম</h3>
+<p class="muted">মাসের নাম নিজে লিখুন। কোনো নাম আগে থেকে দেওয়া নেই।</p>
+<div id="monthList"></div>
+<button class="primary" onclick="saveFormConfig()">বিষয় ও মাস সেভ করুন</button>
+<hr>
+<p class="muted">তথ্য এই ব্রাউজারের স্থানীয় স্টোরেজে থাকে। আলাদা অনলাইন ডেটাবেজ বা নিরাপদ অ্যাডমিন লগইন এখনো যুক্ত হয়নি।</p>
+</div>`;
+drawConfig();
+}
+
+function drawConfig(){
+document.getElementById("subjectList").innerHTML=config.subjects.map((s,i)=>`
+<div class="record">
+<label style="flex:1">বিষয় ${i+1}
+<input id="sub${i}" value="${esc(s)}" placeholder="বিষয়ের নাম লিখুন">
+</label>
+<button class="danger" onclick="removeSubject(${i})">বাদ</button>
+</div>`).join("");
+
+document.getElementById("monthList").innerHTML=config.months.map((m,i)=>`
+<label>মাস ${i+1}
+<input id="mon${i}" value="${esc(m)}" placeholder="মাসের নাম নিজে লিখুন">
+</label>`).join("");
+}
+
+function addSubject(){
+config.subjects.push("");
+drawConfig();
+}
+
+function removeSubject(i){
+config.subjects.splice(i,1);
+drawConfig();
+}
+
+function saveFormConfig(){
+config.subjects=config.subjects.map((_,i)=>document.getElementById("sub"+i)?.value.trim()||"").filter(Boolean);
+config.months=config.months.map((_,i)=>document.getElementById("mon"+i)?.value.trim()||"");
+saveConfig();
+alert("বিষয় ও মাসের নাম সেভ হয়েছে");
+settings();
+}
+
+render();
 </script>
 </body>
 </html>
